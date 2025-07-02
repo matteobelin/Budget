@@ -1,5 +1,6 @@
 import UserContext from "../../context/UserContex"
 import { useContext } from "react"
+import CreateCategory from "../categorie/CreateCategory"
 
 function Home(){
 
@@ -10,6 +11,7 @@ function Home(){
         <>
             <p>Home</p>
             <button onClick={logout}>Deconnexion</button>
+            <CreateCategory />
         </>
     )
 }
