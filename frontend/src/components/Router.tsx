@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import UserContext from "../context/UserContex"
 import type User from "../interface/UserInterface"
 import Home from "./home/Home"
-import CreateCategory from "./categorie/CreateCategory"
+import CreateCategory from "./categorie/CreateCategoryTest"
 
 function Router() {
     const [name, setName] = useState<User | undefined>(undefined)

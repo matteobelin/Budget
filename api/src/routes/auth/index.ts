@@ -6,10 +6,9 @@ import redisRateLimiter from "../../middleware/redisRateLimiter";
 
 const router = express.Router();
 
-router.use(redisRateLimiter);
-
-router.use(loginRouter);
-router.use(signupRouter);
 router.use(logOutRouter)
+
+router.use(redisRateLimiter,loginRouter);
+router.use(redisRateLimiter,signupRouter);
 
 export default router;

@@ -79,11 +79,7 @@ function SignUp() {
                                         <FormItem>
                                             <FormLabel>Nom</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Dupont"
-                                                    {...field}
-                                                />
+                                                <Input type="text" placeholder="Dupont" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -97,11 +93,7 @@ function SignUp() {
                                         <FormItem>
                                             <FormLabel>Prénom</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Jean"
-                                                    {...field}
-                                                />
+                                                <Input type="text" placeholder="Jean" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -116,11 +108,7 @@ function SignUp() {
                                     <FormItem>
                                         <FormLabel>Email</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="email"
-                                                placeholder="jean.dupont@gmail.com"
-                                                {...field}
-                                            />
+                                            <Input type="email" placeholder="jean.dupont@gmail.com" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -134,11 +122,7 @@ function SignUp() {
                                     <FormItem>
                                         <FormLabel>Mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="*********"
-                                                {...field}
-                                            />
+                                            <Input type="password" placeholder="*********" {...field}/>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -152,11 +136,7 @@ function SignUp() {
                                     <FormItem>
                                         <FormLabel>Confirmer le mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="*********"
-                                                {...field}
-                                            />
+                                            <Input type="password" placeholder="*********" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -165,24 +145,17 @@ function SignUp() {
 
                             {errorMessage && (
                                 <Alert variant="destructive">
-                                    <AlertDescription>
-                                        {errorMessage}
-                                    </AlertDescription>
+                                    <AlertDescription> {errorMessage} </AlertDescription>
                                 </Alert>
                             )}
 
-                            <Button type="submit" className="w-full">
-                                Créer mon compte
-                            </Button>
+                            <Button type="submit" className="w-full"> Créer mon compte </Button>
                         </form>
                     </Form>
 
                     <div className="mt-6 text-center">
                         <span className="text-sm text-muted-foreground">Déjà un compte ? </span>
-                        <Link
-                            to="/login"
-                            className="text-sm font-medium text-primary hover:underline"
-                        >
+                        <Link to="/login" className="text-sm font-medium text-primary hover:underline">
                             Se connecter
                         </Link>
                     </div>

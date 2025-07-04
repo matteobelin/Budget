@@ -75,11 +75,7 @@ function Login() {
                                     <FormItem>
                                         <FormLabel>Email</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="email"
-                                                placeholder="jean.dupont@gmail.com"
-                                                {...field}
-                                            />
+                                            <Input type="email" placeholder="jean.dupont@gmail.com" {...field}/>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -93,11 +89,7 @@ function Login() {
                                     <FormItem>
                                         <FormLabel>Mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="*********"
-                                                {...field}
-                                            />
+                                            <Input type="password" placeholder="*********" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -106,33 +98,23 @@ function Login() {
 
                             {errorMessage && (
                                 <Alert variant="destructive">
-                                    <AlertDescription>
-                                        {errorMessage}
-                                    </AlertDescription>
+                                    <AlertDescription> {errorMessage} </AlertDescription>
                                 </Alert>
                             )}
 
-                            <Button type="submit" className="w-full">
-                                Connexion
-                            </Button>
+                            <Button type="submit" className="w-full"> Connexion</Button>
                         </form>
                     </Form>
 
                     <div className="mt-6 text-center space-y-2">
                         <div>
                             <span className="text-sm text-muted-foreground">Pas de compte ? </span>
-                            <Link
-                                to="/signup"
-                                className="text-sm font-medium text-primary hover:underline"
-                            >
+                            <Link to="/signup" className="text-sm font-medium text-primary hover:underline">
                                 Créer un compte
                             </Link>
                         </div>
                         <div>
-                            <a
-                                href="/rest-password"
-                                className="text-sm text-muted-foreground hover:underline"
-                            >
+                            <a href="/rest-password" className="text-sm text-muted-foreground hover:underline">
                                 Mot de passe oublié ?
                             </a>
                         </div>
