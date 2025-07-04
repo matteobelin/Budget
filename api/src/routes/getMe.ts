@@ -7,7 +7,7 @@ import { authMiddleware } from "../middleware/authMiddleWare";
 const router = express.Router();
 
 router.get("/me",authMiddleware, async (req: Request, res: Response<GetMeDataError | GetMeDataResponse>) => {
-        const email = (req as any).userEmail;
+        const email = (req as any).user.email;
 
         const user = await User.findOne({ email }).exec();
 

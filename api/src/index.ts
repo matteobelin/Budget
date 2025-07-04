@@ -5,6 +5,9 @@ import authRoutes from './routes/auth';
 import getMe from './routes/getMe';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import {authMiddleware} from "./middleware/authMiddleWare"
+import categoryRoutes from "./routes/category"
+import depenseRoutes from "./routes/depense"
 
 
 const app = express();
@@ -19,7 +22,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/auth', authRoutes);
-
+app.use("/category",authMiddleware,categoryRoutes)
+app.use("/depense",authMiddleware,depenseRoutes)
 app.use(getMe);
 
 

@@ -1,8 +1,8 @@
 import express from "express";
-import createCategory from "./createCategory"
+import createDepense from "./createDepense"
 
 const router = express.Router();
 
-router.use(createCategory)
+router.use(createDepense)
 
 export default router

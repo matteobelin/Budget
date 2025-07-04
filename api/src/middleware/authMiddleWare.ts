@@ -24,7 +24,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         return 
     }
 
-    (req as any).userEmail = decoded;
+    (req as any).user = decoded;
 
     next(); 
 };

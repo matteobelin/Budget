@@ -45,8 +45,6 @@ router.post("/signup", async ( req: Request<SignUpData>, res: Response<SignUpDat
             maxAge: 12 * 60 * 60 * 1000
         });
 
-        console.log("here5")
-
         res.status(201).json({
             firstname: user.firstname,
             lastname: user.lastname,
