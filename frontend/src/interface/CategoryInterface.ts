@@ -8,6 +8,6 @@ export interface EditCategoryData extends CategoryData{
 }
 
 
-export type GetListCategoryData = CategoryData[]
+export type GetListCategoryData = EditCategoryData[]
 
 

@@ -6,3 +6,4 @@ export const CreateCategorySchema = z.object({
         .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, { message: "La couleur doit être valide" })
 })
 
+
