@@ -61,7 +61,7 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
         await session.close();
         
         
-        res.status(200).send()
+        res.status(200).send({ message: "Dépence créée avec succès" })
         return
     }catch(error){
         console.log(error)

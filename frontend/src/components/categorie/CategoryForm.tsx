@@ -15,11 +15,12 @@ interface Props {
     initialData?: CategoryData;
     onClose: () => void;
     onSubmit: (data: CategoryData) => Promise<void> | void
-    errorMessage: string
+    errorMessage: string;
+    creationMessage:string
 }
 
 
-function CategoryForm({initialData,onClose,onSubmit,errorMessage}:Props){
+function CategoryForm({initialData,onClose,onSubmit,errorMessage,creationMessage}:Props){
 
     const form = useForm<CategoryData>({
                 resolver:zodResolver(CreateCategorySchema),
@@ -81,6 +82,12 @@ function CategoryForm({initialData,onClose,onSubmit,errorMessage}:Props){
                             {errorMessage && (
                                 <Alert variant="destructive">
                                     <AlertDescription> {errorMessage} </AlertDescription>
+                                </Alert>
+                            )}
+
+                            {creationMessage && (
+                                <Alert className="alert-success">
+                                    <AlertDescription>{creationMessage}</AlertDescription>
                                 </Alert>
                             )}
                             <Button type="submit">Créer</Button>

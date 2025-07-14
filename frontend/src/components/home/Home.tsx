@@ -3,6 +3,7 @@ import { useContext } from "react"
 import CreateCategory from "../categorie/CreateCategory"
 import { useState } from "react"
 import CreateDepense from "../depense/CreateDepense"
+import CategorieList from "../categorie/ListAllCategories"
 
 function Home(){
 
@@ -19,6 +20,7 @@ function Home(){
                 <CreateCategory onClose={() => setShowForm(false)} />
             )}
             <CreateDepense />
+            <CategorieList />
         </>
     )
 }

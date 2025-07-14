@@ -14,7 +14,9 @@ import { Calendar } from "../ui/calendar"
 
 import { DepenseSchema } from "@/schema/DepenseSchema"
 import type { DepenseData } from "@/interface/DepenseInterface"
-import type { GetListCategoryData } from "@/interface/CategoryInterface"
+import { useContext } from "react";
+import CategoryContext from "@/context/CategoryContext";
+
 
 import { cn } from "@/lib/utils"
 
@@ -26,11 +28,12 @@ interface Props {
 
 function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
 
-  const [categoryList, setCategoryList] = useState<GetListCategoryData>([])
+  /*const [categoryList, setCategoryList] = useState<GetListCategoryData>([])*/
   const [open, setOpen] = useState(false);
+  const { categories, refreshCategories } = useContext(CategoryContext);
 
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:3000/category/all", {
@@ -39,7 +42,6 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
         });
 
         const responseData: GetListCategoryData = await response.json();
-
         if (response.ok) {
           setCategoryList(responseData);
         }
@@ -49,7 +51,13 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
     };
 
     fetchCategories();
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+  if (!categories) {
+    refreshCategories();
+  }
+}, [categories, refreshCategories]);
 
   const form = useForm<DepenseData>({
     resolver: zodResolver(DepenseSchema),
@@ -152,7 +160,7 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="default">Default</SelectItem>
-                          {categoryList.map((category) => (
+                          {categories.map((category) => (
                             <SelectItem key={category.categoryName} value={category.categoryName}>
                               {category.categoryName}
                             </SelectItem>

@@ -1,6 +1,7 @@
-import { useState } from "react"
+import { useState,useContext  } from "react"
 import CategoryForm from "./CategoryForm";
 import type { CategoryData } from "@/interface/CategoryInterface";
+import CategoryContext from "@/context/CategoryContext"
 
 interface Props {
     onClose: () => void;
@@ -8,8 +9,10 @@ interface Props {
 
 
 function CreateCategory({ onClose }: Props){
+    const { refreshCategories } = useContext(CategoryContext);
 
     const [errorMessage, setErrorMessage] = useState("")
+    const [creationMessage, setCreationMessage] = useState("")
 
     const onSubmit= async (data:CategoryData)=>{
             setErrorMessage("")
@@ -27,7 +30,11 @@ function CreateCategory({ onClose }: Props){
                     setErrorMessage(responseData.message || "Erreur lors de la création de la catégorie")
                     return;
                 }
-                onClose()
+
+                setCreationMessage(responseData.message)
+                await refreshCategories()
+                setTimeout(onClose, 3000);
+                return
     
             }catch (error){
                 setErrorMessage("Une erreur est survenue lors de la création de la catégorie")
@@ -36,7 +43,7 @@ function CreateCategory({ onClose }: Props){
     
     return (
         <>
-        <CategoryForm onClose={onClose} onSubmit={onSubmit} errorMessage={errorMessage} />
+        <CategoryForm onClose={onClose} onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage}/>
         </>
     )
     
