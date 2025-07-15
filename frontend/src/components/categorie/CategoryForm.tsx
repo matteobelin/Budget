@@ -26,7 +26,7 @@ function CategoryForm({initialData,onClose,onSubmit,errorMessage,creationMessage
                 resolver:zodResolver(CreateCategorySchema),
                 defaultValues: initialData ??{
                     categoryName:"",
-                    color:""
+                    color:"#000"
                 }
             }
         )
@@ -39,14 +39,14 @@ function CategoryForm({initialData,onClose,onSubmit,errorMessage,creationMessage
                 size="icon"
                 onClick={onClose}
                 variant="ghost"
-                className="absolute right-2 top-2 rounded-full"
+                className="absolute right-2 top-2 rounded-full cursor-pointer"
             >
                 <X className="h-4 w-4" />
             </Button>
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold text-center">Catégorie</CardTitle>
                 <CardDescription className="text-center">
-                    Créer une catégorie
+                    {initialData ? "Modifier une catégorie" : "Créer une catégorie"}
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -90,7 +90,7 @@ function CategoryForm({initialData,onClose,onSubmit,errorMessage,creationMessage
                                     <AlertDescription>{creationMessage}</AlertDescription>
                                 </Alert>
                             )}
-                            <Button type="submit">Créer</Button>
+                            <Button className="cursor-pointer" type="submit">{initialData ? "Modifier" : "Créer"}</Button>
                         </div>
                     </form>
                 </Form>

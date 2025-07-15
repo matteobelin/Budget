@@ -3,7 +3,7 @@ import { useContext } from "react"
 import CreateCategory from "../categorie/CreateCategory"
 import { useState } from "react"
 import CreateDepense from "../depense/CreateDepense"
-import CategorieList from "../categorie/ListAllCategories"
+import CategorieList from "../categorie/List/ListAllCategories"
 
 function Home(){
 

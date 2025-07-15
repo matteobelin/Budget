@@ -34,22 +34,36 @@ router.get("/all", async ( req: Request, res: Response<DepenseDataError | GetLis
                 const c = record.get('c');
                 const categoryId = record.get('categoryId');
 
-                const category = await Category.findById(categoryId);
-
-                if (!category){
-                    res.status(400).json({message:"Erreur lors du chargements des catégories"})
-                    return;
+                if(categoryId!="Default"){
+                    const category = await Category.findById(categoryId);
+    
+                    if (!category){
+                        res.status(400).json({message:"Erreur lors du chargements des catégories"})
+                        return;
+                    }
+                    depenses.push({
+                        _id: c.identity.toString(),
+                        montant: c.properties.montant,
+                        description: c.properties.description,
+                        date: c.properties.date,
+                        tags: c.properties.tags || "",
+                        categoryName: category.categoryName,
+                        categoryColor: category.color
+                    });
+                }else{
+                    depenses.push({
+                        _id: c.identity.toString(),
+                        montant: c.properties.montant,
+                        description: c.properties.description,
+                        date: c.properties.date,
+                        tags: c.properties.tags || "",
+                        categoryName: "Default",
+                        categoryColor: "#A9A9A9"
+                    });
                 }
 
-                depenses.push({
-                    _id: c.identity.toString(),
-                    montant: c.properties.montant,
-                    description: c.properties.description,
-                    date: c.properties.date,
-                    tags: c.properties.tags || "",
-                    categoryName: category.categoryName,
-                    categoryColor: category.color
-                });
+
+
             }
 
             await client.set(key, JSON.stringify(depenses));

@@ -33,7 +33,7 @@ function CreateCategory({ onClose }: Props){
 
                 setCreationMessage(responseData.message)
                 await refreshCategories()
-                setTimeout(onClose, 3000);
+                setTimeout(onClose, 1000);
                 return
     
             }catch (error){

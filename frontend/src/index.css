@@ -3,7 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -116,10 +115,11 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+     @apply bg-background text-foreground min-h-screen;
   }
 }
 
 .alert-success {
     @apply bg-green-100 border-green-500 text-green-700;
 }
+

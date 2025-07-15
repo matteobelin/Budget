@@ -5,10 +5,16 @@ import ProtectedRoute from "./ProtectedRoute"
 import { useEffect, useState } from "react"
 import UserContext from "../context/UserContex"
 import CategoryContext from "../context/CategoryContext"
+import DepenseContext from "@/context/DepenseContext"
 import type User from "../interface/UserInterface"
 import Home from "./home/Home"
-import CreateDepense from "./depense/CreateDepense"
+import CategorieList from "./categorie/List/ListAllCategories"
+import Layout from "./Sidebar/layout"
+import { Toaster } from "sonner";
+
 import type { GetListCategoryData } from "@/interface/CategoryInterface"
+import type { GetListDepenseData } from "@/interface/DepenseInterface"
+import DepenseList from "./depense/List/ListeAllDepenses"
 
 function Router() {
     const [name, setName] = useState<User | undefined>(undefined)
@@ -43,6 +49,23 @@ function Router() {
         }
     }
 
+    const [depenses,setDepenses] = useState<GetListDepenseData>([])
+
+    const refreshDepenses = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/depense/all", {
+                method: "GET",
+                credentials: "include"
+            })
+            const data: GetListDepenseData = await response.json()
+            if (response.ok) {
+                setDepenses(data)
+            }
+        } catch (error) {
+            console.error("Erreur lors du chargement des catégories :", error)
+        }
+    }
+
     useEffect(() => {
         fetch("http://localhost:3000/me", {
             method: 'GET',
@@ -58,6 +81,7 @@ function Router() {
                 setName(json)
                 setLoading(false)
                 refreshCategories()
+                refreshDepenses()
             })
             .catch(() => {
                 setName(undefined)
@@ -72,12 +96,37 @@ function Router() {
     return (
         <UserContext.Provider value={{ name, login, logout }}>
             <CategoryContext.Provider value={{ categories, refreshCategories }}>
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                    <Route path="/create" element={<ProtectedRoute><CreateDepense  /></ProtectedRoute>} />
-                </Routes>
+                <DepenseContext.Provider value={{depenses,refreshDepenses}}>
+                    <>
+                    <Toaster richColors /> {}
+
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                        <Route
+                            path="/depenseList"
+                            element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <DepenseList />
+                                </Layout>
+                            </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/categoryList"
+                            element={
+                            <ProtectedRoute>
+                                <Layout>
+                                <CategorieList />
+                                </Layout>
+                            </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                    </>
+                </DepenseContext.Provider>
             </CategoryContext.Provider>
         </UserContext.Provider>
     )

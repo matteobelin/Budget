@@ -3,11 +3,11 @@ export interface CategoryData {
   color : string
 }
 
-export interface EditCategoryData extends CategoryData{
+export interface CategoryDataWithId extends CategoryData{
   _id:string;
 }
 
 
-export type GetListCategoryData = CategoryData[]
+export type GetListCategoryData = CategoryDataWithId[]
 
 

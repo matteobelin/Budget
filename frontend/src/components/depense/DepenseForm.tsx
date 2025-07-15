@@ -33,31 +33,12 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
   const { categories, refreshCategories } = useContext(CategoryContext);
 
 
-  /*useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/category/all", {
-          method: "GET",
-          credentials: "include"
-        });
-
-        const responseData: GetListCategoryData = await response.json();
-        if (response.ok) {
-          setCategoryList(responseData);
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des catégories :", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);*/
 
   useEffect(() => {
-  if (!categories) {
-    refreshCategories();
-  }
-}, [categories, refreshCategories]);
+    if (!categories) {
+      refreshCategories();
+    }
+  }, [categories, refreshCategories]);
 
   const form = useForm<DepenseData>({
     resolver: zodResolver(DepenseSchema),
@@ -89,7 +70,7 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                   <FormItem>
                     <FormLabel>Montant de la dépense *</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                      <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -159,7 +140,7 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                           <SelectValue placeholder="Sélectionner un thème" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="default">Default</SelectItem>
+                          <SelectItem value="Default">Default</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.categoryName} value={category.categoryName}>
                               {category.categoryName}

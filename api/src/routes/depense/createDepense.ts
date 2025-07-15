@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import type { DepenseData, DepenseDataError } from "../../interface/DepenseData";
 import Category from "../../models/Category";
 import driver from "../../dataBase/neo4j";
+import { client } from "../../dataBase/redis"
 
 const router = express.Router();
 
@@ -12,6 +13,15 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
 
         const user = (req as any).user;
         const customerId = user.id;
+
+        const key = customerId + "depenses"
+        
+        let requests = await client.get(key);
+    
+
+        if (requests != null) {
+            await client.del(key); 
+        }
     
 
         const result = DepenseSchema.safeParse(req.body);
@@ -25,19 +35,24 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
         result.data.tags ||= "";
 
         const { montant,description,date,categoryName,tags } = result.data;
-        
-        const existingCategory = await Category.findOne({
-            categoryName: categoryName,
-            customerId: customerId
-        })
-        
-        if(!existingCategory){
-            res.status(400).json({message: "La catégorie n'existe pas"})
-            return
+        let categoryId
+
+        console.log(categoryName)
+
+        if(categoryName!="Default"){
+            const existingCategory = await Category.findOne({
+                categoryName: categoryName,
+                customerId: customerId
+            })
+            
+            if(!existingCategory){
+                res.status(400).json({message: "La catégorie n'existe pas"})
+                return
+            }
+            categoryId = existingCategory._id.toString()
+        }else{
+            categoryId = "Default"
         }
-
-        const categoryId = existingCategory._id.toString()
-
         
         
         const session = driver.session();
