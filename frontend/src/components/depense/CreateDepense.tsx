@@ -1,10 +1,17 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import type { DepenseData } from "@/interface/DepenseInterface"
 import DepenseForm from "./DepenseForm"
+import DepenseContext from "@/context/DepenseContext"
 
-function CreateDepense(){
+interface Props{
+    onClose:()=>void
+}
+
+function CreateDepense({onClose}:Props){
 
     const [errorMessage, setErrorMessage] = useState("")
+    const [creationMessage, setCreationMessage] = useState("")
+    const {refreshDepenses} = useContext(DepenseContext)
 
     const onSubmit= async (data:DepenseData)=>{
             setErrorMessage("")
@@ -23,6 +30,9 @@ function CreateDepense(){
                     return;
                 }
     
+                setCreationMessage(responseData.message)
+                await refreshDepenses()
+                setTimeout(onClose,1000)
             }catch (error){
                 setErrorMessage("Une erreur est survenue lors de la création de la dépense")
             }
@@ -30,7 +40,7 @@ function CreateDepense(){
 
         return (
             <>
-                <DepenseForm onSubmit={onSubmit} errorMessage={errorMessage} />
+                <DepenseForm onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage}/>
             </>
         )
 

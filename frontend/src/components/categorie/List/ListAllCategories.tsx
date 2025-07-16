@@ -8,6 +8,7 @@ import CategoryRow from "./CategoryRow"
 import CreateCategory from "../CreateCategory"
 import EditCategory from "../EditCategory"
 import type { CategoryDataWithId } from "@/interface/CategoryInterface"
+import {Dialog,DialogContent,DialogTitle,DialogDescription } from "@/components/ui/dialog"
 
 function CategorieList(){
 
@@ -54,16 +55,24 @@ function CategorieList(){
       </div>
 
       {showFormCreate && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center mb-0">
-          <CreateCategory onClose={() => setShowFormCreate(false)} />
-        </div>
+        <Dialog open={showFormCreate} onOpenChange={setShowFormCreate}>
+          <DialogContent className="sm:max-w-md">
+            <DialogTitle className="hidden"/>
+            <DialogDescription />
+            <CreateCategory onClose={() => setShowFormCreate(false)} />
+          </DialogContent>
+        </Dialog>
       )}
 
 
       {showFormEdit && categoryToEdit  && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center mb-0">
-          <EditCategory onClose={() => setShowFormEdit(false)} category={categoryToEdit} />
-        </div>
+        <Dialog open={showFormEdit} onOpenChange={setShowFormEdit}>
+          <DialogContent className="sm:max-w-md">
+            <DialogTitle className="hidden"/>
+            <DialogDescription />
+            <EditCategory onClose={() => setShowFormEdit(false)} category={categoryToEdit}/>
+          </DialogContent>
+        </Dialog>
       )}
 
       <Table>

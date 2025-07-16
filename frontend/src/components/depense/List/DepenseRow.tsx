@@ -43,7 +43,7 @@ function DepenseRow({ depense, onEdit, onDelete }: Props) {
 
         <TableCell>{depense.montant} €</TableCell>
         <TableCell>{depense.description}</TableCell>
-        <TableCell className="pl-8">{new Date(depense.date).toLocaleString()}</TableCell>
+        <TableCell className="pl-8">{new Date(depense.date).toLocaleDateString("fr-FR")}</TableCell>
         <TableCell>{depense.tags}</TableCell>
 
         <TableCell className="text-right space-x-2">

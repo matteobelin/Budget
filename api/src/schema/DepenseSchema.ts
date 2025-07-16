@@ -12,3 +12,18 @@ export const DepenseSchema = z.object({
     categoryName: z.string({ message : "La categorie doit être renseigné" }),
     tags: z.string({ message :  "tag invalide" }).optional()
 })
+
+
+export const EditDepenseSchema = z.object({
+   _id:z.string({ required_error: "La dépense doit avoir un id" }),
+    montant: z
+    .number({ message : "Le montant doit être un nombre" })
+    .positive({message : "Le montant doit être positif"})
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val.toString()), {
+      message: "Le montant ne peut avoir que deux décimales au maximum",
+    }),
+    description: z.string({ message : "La description doit être renseigné" }),
+    date:z.string({ message : "La date doit être renseigné"}),
+    categoryName: z.string({ message : "La categorie doit être renseigné" }),
+    tags: z.string({ message :  "tag invalide" }).optional()
+})

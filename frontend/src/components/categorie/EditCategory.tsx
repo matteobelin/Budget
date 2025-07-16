@@ -49,7 +49,7 @@ function EditCategory({onClose,category}:Props){
     
         return (
             <>
-                <CategoryForm initialData={category} onClose={onClose} onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage} />
+                <CategoryForm initialData={category} onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage} />
             </>
         )
     

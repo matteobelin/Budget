@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import LoginSchema from "../../schema/LoginSchema"
 import { useForm } from "react-hook-form"
 import type { LoginData, LoginDataReception } from "../../interface/LoginDataInterface"
+import { Eye, EyeOff } from "lucide-react"
 
 
 // Import des composants shadcn/ui
@@ -18,6 +19,8 @@ function Login() {
     const { name, login } = useContext(UserContext)
     const navigation = useNavigate()
     const [errorMessage, setErrorMessage] = useState("")
+    const [showPassword, setShowPassword] = useState(false);
+
 
     useEffect(() => {
         if (name) {
@@ -90,13 +93,23 @@ function Login() {
                                     <FormItem>
                                         <FormLabel>Mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input type="password" placeholder="*********" {...field} />
+                                            <div className="relative">
+                                                <Input type={showPassword ? "text" : "password"} placeholder="*********" {...field} />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((prev) => !prev)}
+                                                    className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-primary"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                                                </button>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
+                                
                             />
-
                             {errorMessage && (
                                 <Alert variant="destructive">
                                     <AlertDescription> {errorMessage} </AlertDescription>

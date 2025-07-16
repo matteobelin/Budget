@@ -15,6 +15,7 @@ import { Toaster } from "sonner";
 import type { GetListCategoryData } from "@/interface/CategoryInterface"
 import type { GetListDepenseData } from "@/interface/DepenseInterface"
 import DepenseList from "./depense/List/ListeAllDepenses"
+import ChartPieDonutText from "./chart/PieChart"
 
 function Router() {
     const [name, setName] = useState<User | undefined>(undefined)
@@ -120,6 +121,16 @@ function Router() {
                             <ProtectedRoute>
                                 <Layout>
                                 <CategorieList />
+                                </Layout>
+                            </ProtectedRoute>
+                            }
+                        />
+                    <Route
+                            path="/chart"
+                            element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <ChartPieDonutText />
                                 </Layout>
                             </ProtectedRoute>
                             }

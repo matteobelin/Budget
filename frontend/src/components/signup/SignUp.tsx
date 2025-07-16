@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import type { SignUpData, SignUpDataReception } from "../../interface/SignUpDataInterface"
 import SignUpSchema from "../../schema/SignUpSchema"
+import { Eye, EyeOff } from "lucide-react"
 
 // Import des composants shadcn/ui
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,8 @@ function SignUp() {
     const { name, login } = useContext(UserContext)
     const navigation = useNavigate()
     const [errorMessage, setErrorMessage] = useState("")
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         if (name) {
@@ -122,7 +125,22 @@ function SignUp() {
                                     <FormItem>
                                         <FormLabel>Mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input type="password" placeholder="*********" {...field}/>
+                                            <div className="relative">
+                                                <Input
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="*********"
+                                                    {...field}
+                                                    className="pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(prev => !prev)}
+                                                    className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-primary"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" /> }
+                                                </button>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -136,7 +154,22 @@ function SignUp() {
                                     <FormItem>
                                         <FormLabel>Confirmer le mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input type="password" placeholder="*********" {...field} />
+                                            <div className="relative">
+                                                <Input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    placeholder="*********"
+                                                    {...field}
+                                                    className="pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                                                    className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-primary"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showConfirmPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                                                </button>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

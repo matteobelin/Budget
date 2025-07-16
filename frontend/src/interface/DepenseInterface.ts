@@ -7,9 +7,9 @@ export interface DepenseData{
     tags ?: string;
 }
 
-export interface EditDepenseData extends DepenseData{
+export interface DepenseDataWithId extends DepenseData{
     _id:string;
 }
 
-export type GetListDepenseData = EditDepenseData[]
+export type GetListDepenseData = DepenseDataWithId[]
 

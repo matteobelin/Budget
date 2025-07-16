@@ -6,21 +6,19 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { X } from "lucide-react"
 
 import type { CategoryData } from "@/interface/CategoryInterface"
 import { CreateCategorySchema } from "@/schema/CategorySchema"
 
 interface Props {
     initialData?: CategoryData;
-    onClose: () => void;
     onSubmit: (data: CategoryData) => Promise<void> | void
     errorMessage: string;
     creationMessage:string
 }
 
 
-function CategoryForm({initialData,onClose,onSubmit,errorMessage,creationMessage}:Props){
+function CategoryForm({initialData,onSubmit,errorMessage,creationMessage}:Props){
 
     const form = useForm<CategoryData>({
                 resolver:zodResolver(CreateCategorySchema),
@@ -34,15 +32,7 @@ function CategoryForm({initialData,onClose,onSubmit,errorMessage,creationMessage
 
     return (
         <>
-        <Card className="relative w-full max-w-md">
-            <Button
-                size="icon"
-                onClick={onClose}
-                variant="ghost"
-                className="absolute right-2 top-2 rounded-full cursor-pointer"
-            >
-                <X className="h-4 w-4" />
-            </Button>
+        <Card className="relative w-full max-w-md border-none shadow-none bg-transparent">
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold text-center">Catégorie</CardTitle>
                 <CardDescription className="text-center">

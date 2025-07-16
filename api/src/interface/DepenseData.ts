@@ -5,11 +5,14 @@ export interface DepenseData{
     categoryName:string;
     tags?:string;
 }
-
-export interface GetDepenseResponse extends DepenseData{
+export interface DepenseDataWithId extends DepenseData{
     _id:string
+}
+
+export interface GetDepenseResponse extends DepenseDataWithId{
     categoryColor:string
 }
+
 
 export interface DepenseDataError{
     message:string

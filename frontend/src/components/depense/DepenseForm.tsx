@@ -5,6 +5,7 @@ import { CalendarIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -24,14 +25,14 @@ interface Props {
   initialData?: DepenseData;
   onSubmit: (data: DepenseData) => Promise<void> | void;
   errorMessage?: string;
+  creationMessage:string
 }
 
-function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
 
-  /*const [categoryList, setCategoryList] = useState<GetListCategoryData>([])*/
+function DepenseForm({ initialData, errorMessage, onSubmit ,creationMessage}: Props) {
+
   const [open, setOpen] = useState(false);
   const { categories, refreshCategories } = useContext(CategoryContext);
-
 
 
   useEffect(() => {
@@ -42,17 +43,22 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
 
   const form = useForm<DepenseData>({
     resolver: zodResolver(DepenseSchema),
-    defaultValues: initialData ?? {
-      montant: 0,
-      description: "",
-      date: new Date(),
-      categoryName: "",
-      tags: ""
-    }
+    defaultValues: initialData
+    ? {
+        ...initialData,
+        date: new Date(initialData.date),
+      }
+    : {
+        montant: 0,
+        description: "",
+        date: new Date(),
+        categoryName: "Default",
+        tags: ""
+      }
   });
 
   return (
-    <Card className="w-full max-w-md">
+   <Card className="relative w-full max-w-md border-none shadow-none bg-transparent">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Dépense</CardTitle>
         <CardDescription className="text-center">
@@ -84,7 +90,19 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                   <FormItem>
                     <FormLabel>Renseigner une description *</FormLabel>
                     <FormControl>
-                      <Input type="text" {...field} />
+                      <div>
+                        <Textarea 
+                          {...field}
+                          placeholder="Entrez votre description..."
+                          rows={4}
+                          maxLength={250}
+                          value={field.value || ""}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                        <div className="text-sm text-muted-foreground mt-1 text-right">
+                          {(field.value?.length || 0)} / 250 caractères
+                        </div>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,7 +157,7 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Sélectionner un thème" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[110]" position="popper" sideOffset={5}>
                           <SelectItem value="Default">Default</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.categoryName} value={category.categoryName}>
@@ -161,7 +179,9 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                   <FormItem>
                     <FormLabel>Renseigner un tag (optionnel)</FormLabel>
                     <FormControl>
-                      <Input type="text" {...field} />
+                      <Input type="text" {...field} 
+                        placeholder="Exemple : #BK"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -173,6 +193,11 @@ function DepenseForm({ initialData, errorMessage, onSubmit }: Props) {
                   <AlertDescription>{errorMessage}</AlertDescription>
                 </Alert>
               )}
+              {creationMessage && (
+                <Alert className="alert-success">
+                    <AlertDescription>{creationMessage}</AlertDescription>
+                </Alert>
+            )}
 
               <Button type="submit" className="w-full">
                 {initialData ? "Modifier" : "Créer"}

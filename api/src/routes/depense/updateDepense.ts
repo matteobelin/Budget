@@ -1,21 +1,20 @@
 import express from "express";
-import { DepenseSchema } from "../../schema/DepenseSchema";
+import { EditDepenseSchema } from "../../schema/DepenseSchema";
 import type { Request, Response } from "express";
-import type { DepenseData, DepenseDataError } from "../../interface/DepenseData";
+import type { DepenseDataError, DepenseDataWithId } from "../../interface/DepenseData";
 import Category from "../../models/Category";
 import driver from "../../dataBase/neo4j";
 import { client } from "../../dataBase/redis"
 
 const router = express.Router();
 
-router.post("/create", async ( req: Request<DepenseData>, res: Response< null|DepenseDataError> )=>{
+router.put("/update", async ( req: Request<DepenseDataWithId>, res: Response< null|DepenseDataError> )=>{
     try{
 
         const user = (req as any).user;
         const customerId = user.id;
-    
 
-        const result = DepenseSchema.safeParse(req.body);
+        const result = EditDepenseSchema.safeParse(req.body);
         
 
         if (!result.success) {
@@ -25,7 +24,7 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
         
         result.data.tags ||= "";
 
-        const { montant,description,date,categoryName,tags } = result.data;
+        const { _id,montant,description,date,categoryName,tags } = result.data;
         let categoryId
 
         if(categoryName!="Default"){
@@ -46,23 +45,25 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
         
         const session = driver.session();
         
-        await session.run(
+        const resultDepense = await session.run(
             `
-            MERGE (a:User {id: $customerId})
+            MATCH (d:Depense) WHERE id(d) = $_id
+            OPTIONAL MATCH (d)-[r:APPARTIENT_A]->()
+            DELETE r
+            SET d.montant = $montant,
+                d.description = $description,
+                d.date = $date,
+                d.tags = $tags
             MERGE (b:Category {name: $categoryId})
-            CREATE (c:Depense {
-                montant: $montant,
-                description: $description,
-                date: $date,
-                tags: $tags
-                })
-                CREATE (a)-[:A_FAIT]->(c)
-                CREATE (c)-[:APPARTIENT_A]->(b)
-                `,
-                { customerId, categoryId, montant, description, date, tags }
-            );
-            
-        await session.close();
+            CREATE (d)-[:APPARTIENT_A]->(b)
+            RETURN d
+            `,
+            { _id: parseInt(_id), montant, description, date, tags, categoryId }
+        );
+
+        if (resultDepense.records.length === 0) {
+            res.status(404).send({ message: "Dépense non trouvée" })
+        }   
 
         const key = customerId + "depenses"
         
@@ -73,7 +74,7 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
             await client.del(key); 
         }
         
-        res.status(200).send({ message: "Dépense créée avec succès" })
+        res.status(200).send({ message: "Dépense modifié avec succès" })
         return
     }catch(error){
         console.log(error)

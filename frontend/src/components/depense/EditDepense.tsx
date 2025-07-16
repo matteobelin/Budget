@@ -1,27 +1,29 @@
-import { useState, useEffect } from "react"
-import type { DepenseData,EditDepenseData } from "@/interface/DepenseInterface"
+import { useState,useContext } from "react"
+import type {DepenseDataWithId,DepenseData } from "@/interface/DepenseInterface"
 import DepenseForm from "./DepenseForm"
+import DepenseContext from "@/context/DepenseContext";
 
 interface Props{
-    _id:string
+    onClose:()=>void;
+    depense:DepenseDataWithId
 }
 
-function editDepense({_id}:Props){
+function editDepense({onClose,depense}:Props){
 
     const [errorMessage, setErrorMessage] = useState("")
-    const [depense, setDepense] = useState<DepenseData>()
+    const { refreshDepenses } = useContext(DepenseContext);
+    const [creationMessage, setCreationMessage] = useState("")
 
 
     const onSubmit= async (data:DepenseData)=>{
                 setErrorMessage("")
-                const sendData:EditDepenseData = {
-                    _id,
-                    ...data
-                }
-
+                const sendData:DepenseDataWithId = {
+                                _id: depense._id,
+                                ...data
+                            }
                 try{
                     const response = await fetch("http://localhost:3000/depense/update",{
-                        method: "POST",
+                        method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
                         },
@@ -33,35 +35,19 @@ function editDepense({_id}:Props){
                         setErrorMessage(responseData.message || "Erreur lors de la mise à jour de la dépense")
                         return;
                     }
+
+                    setCreationMessage(responseData.message)
+                    await refreshDepenses()
+                    setTimeout(onClose, 1000);
         
                 }catch (error){
                     setErrorMessage("Une erreur est survenue lors de la mise à jour de la dépense")
                 }
             }
 
-    useEffect(() => {
-        const fetchDepense = async () => {
-          try {
-            const response = await fetch(`http://localhost:3000/depense/id=${_id}`, {
-              method: "GET",
-              credentials: "include"
-            });
-    
-            const responseData: DepenseData = await response.json();
-    
-            if (response.ok) {
-              setDepense(responseData);
-            }
-          } catch (error) {
-            console.error("Erreur lors de la récupération de la dépense :", error);
-          }
-        }
-        fetchDepense()
-    },[]);
-
     return (
             <>
-                <DepenseForm initialData={depense} onSubmit={onSubmit} errorMessage={errorMessage} />
+                <DepenseForm initialData={depense} onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage}/>
             </>
         )
 
