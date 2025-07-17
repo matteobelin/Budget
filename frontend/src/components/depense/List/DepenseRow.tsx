@@ -2,10 +2,10 @@ import { TableRow, TableCell } from "../../ui/table";
 import { useState } from "react";
 import { Button } from "../../ui/button";
 import DeleteAlertDialog from "@/components/AlertDialog/DeleteAlertDialog";
-import type { EditDepenseData } from "@/interface/DepenseInterface";
+import type { DepenseDataWithId } from "@/interface/DepenseInterface";
 
 interface Props {
-  depense: EditDepenseData;
+  depense: DepenseDataWithId;
   onEdit?: () => void;
   onDelete?: () => void;
 }

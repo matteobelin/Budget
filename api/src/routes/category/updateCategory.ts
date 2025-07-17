@@ -3,6 +3,7 @@ import { EditCategorySchema } from "../../schema/CategorySchema";
 import type { Request, Response } from "express";
 import type { GetCategoryResponse, CategoryError } from "../../interface/CategoryData";
 import Category from "../../models/Category";
+import { client } from "../../dataBase/redis"
 
 
 const router = express.Router();
@@ -51,6 +52,21 @@ router.put("/update", async ( req: Request<GetCategoryResponse>, res: Response< 
         existingCategory.color = color;
 
         await existingCategory.save();
+
+        const key = customerId + "depenses"
+        const statKey = customerId + "depensesStat";
+                
+        let requests = await client.get(key);
+        let statRequests = await client.get(statKey);
+    
+
+        if (requests != null) {
+            await client.del(key); 
+        }
+
+        if (statRequests != null){
+            await client.del(statKey); 
+        }
 
         res.status(200).send({ message: "Catégorie modifiée avec succès" });
     }catch (error) {

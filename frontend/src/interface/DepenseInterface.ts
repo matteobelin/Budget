@@ -13,3 +13,4 @@ export interface DepenseDataWithId extends DepenseData{
 
 export type GetListDepenseData = DepenseDataWithId[]
 
+

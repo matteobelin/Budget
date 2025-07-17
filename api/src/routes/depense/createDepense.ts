@@ -65,12 +65,18 @@ router.post("/create", async ( req: Request<DepenseData>, res: Response< null|De
         await session.close();
 
         const key = customerId + "depenses"
+        const statKey = customerId + "depensesStat";
         
         let requests = await client.get(key);
+        let statRequests = await client.get(statKey);
     
 
         if (requests != null) {
             await client.del(key); 
+        }
+
+        if (statRequests != null){
+            await client.del(statKey); 
         }
         
         res.status(200).send({ message: "Dépense créée avec succès" })

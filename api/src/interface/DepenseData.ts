@@ -19,3 +19,23 @@ export interface DepenseDataError{
 }
 
 export type GetListDepenseResponse = GetDepenseResponse[] 
+
+export interface DepenseStatistic{
+    amount : number;
+    categoryName : string;
+    categoryColor : string
+}
+
+export interface DepenseStatisticByMonth{
+    month: string;
+    statistics: DepenseStatistic[];
+    amountTotal :number;
+}
+
+export interface DepenseStatisticByYear{
+    year:string;
+    statistics: DepenseStatisticByMonth[],
+    amountTotalByYear:number
+}
+
+export type DepenseStatisticTotal = DepenseStatisticByYear[]

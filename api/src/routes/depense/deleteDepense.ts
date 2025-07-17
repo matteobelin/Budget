@@ -37,12 +37,18 @@ router.delete("/delete", async ( req: Request<DepenseDataWithId>, res: Response<
         );
         
         const key = customerId + "depenses"
+        const statKey = customerId + "depensesStat";
         
         let requests = await client.get(key);
+        let statRequests = await client.get(statKey);
     
 
         if (requests != null) {
             await client.del(key); 
+        }
+
+        if (statRequests != null){
+            await client.del(statKey); 
         }
         
         res.status(200).send({ message: "Dépense supprimée avec succès" })

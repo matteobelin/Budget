@@ -14,15 +14,6 @@ router.delete("/delete", async ( req: Request<GetCategoryResponse>, res: Respons
         const user = (req as any).user;
         const customerId = user.id;
 
-        const key = customerId + "depenses"
-                
-        let requests = await client.get(key);
-            
-        
-        if (requests != null) {
-            await client.del(key); 
-        }
-
         
         const result = EditCategorySchema.safeParse(req.body);
         
@@ -64,6 +55,21 @@ router.delete("/delete", async ( req: Request<GetCategoryResponse>, res: Respons
         }
 
         await existingCategory.deleteOne();
+
+        const key = customerId + "depenses"
+        const statKey = customerId + "depensesStat";
+        
+        let requests = await client.get(key);
+        let statRequests = await client.get(statKey);
+    
+
+        if (requests != null) {
+            await client.del(key); 
+        }
+
+        if (statRequests != null){
+            await client.del(statKey); 
+        }
 
         res.status(200).json({ message: "Catégorie supprimée" });
 
