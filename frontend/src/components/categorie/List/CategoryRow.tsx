@@ -45,12 +45,12 @@ function CategoryRow({ category, onEdit, onDelete, isDefault = false }: Props) {
         </TableCell>
         <TableCell className="text-right space-x-2">
           {!isDefault && onEdit && (
-            <Button variant="outline" size="sm" onClick={onEdit}>
+            <Button variant="outline" size="sm" className="cursor-pointer" onClick={onEdit}>
               Modifier
             </Button>
           )}
           {!isDefault && onDelete && (
-            <Button variant="destructive" size="sm" onClick={handleDeleteClick}>
+            <Button variant="destructive" className="cursor-pointer" size="sm" onClick={handleDeleteClick}>
               Supprimer
             </Button>
           )}

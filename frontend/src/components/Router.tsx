@@ -15,6 +15,7 @@ import { Toaster } from "sonner";
 import type { GetListCategoryData } from "@/interface/CategoryInterface"
 import type { GetListDepenseData } from "@/interface/DepenseInterface"
 import DepenseList from "./depense/List/ListeAllDepenses"
+import ChatDemo from "./chat/chat"
 
 function Router() {
     const [name, setName] = useState<User | undefined>(undefined)
@@ -128,6 +129,16 @@ function Router() {
                             <ProtectedRoute>
                                 <Layout>
                                 <CategorieList />
+                                </Layout>
+                            </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/chat"
+                            element={
+                            <ProtectedRoute>
+                                <Layout>
+                                <ChatDemo />
                                 </Layout>
                             </ProtectedRoute>
                             }

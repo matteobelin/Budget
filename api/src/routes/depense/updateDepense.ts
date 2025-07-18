@@ -4,50 +4,52 @@ import type { Request, Response } from "express";
 import type { DepenseDataError, DepenseDataWithId } from "../../interface/DepenseData";
 import Category from "../../models/Category";
 import driver from "../../dataBase/neo4j";
-import { client } from "../../dataBase/redis"
+import { client } from "../../dataBase/redis";
+import { userInfoCollection } from "../../dataBase/chromaDB";
 
 const router = express.Router();
 
-router.put("/update", async ( req: Request<DepenseDataWithId>, res: Response< null|DepenseDataError> )=>{
-    try{
+router.put("/update", async (req: Request<DepenseDataWithId>, res: Response<null | DepenseDataError>) => {
+    const session = driver.session();
 
+    try {
         const user = (req as any).user;
+        if (!user || !user.id) {
+            res.status(401).json({ message: "Utilisateur non authentifié" });
+            return 
+        }
+
         const customerId = user.id;
 
         const result = EditDepenseSchema.safeParse(req.body);
-        
-
         if (!result.success) {
-            res.status(400).json({message: "Donnée de saisis invalides"});
-            return ;
+            res.status(400).json({ message: "Données de saisie invalides"});
+            return
         }
-        
-        result.data.tags ||= "";
 
-        const { _id,montant,description,date,categoryName,tags } = result.data;
-        let categoryId
+        const { _id, montant, description, date, categoryName } = result.data;
+        const tags = result.data.tags || "";
 
-        if(categoryName!="Default"){
+        let categoryId;
+        if (categoryName !== "Default") {
             const existingCategory = await Category.findOne({
                 categoryName: categoryName,
                 customerId: customerId
-            })
-            
-            if(!existingCategory){
-                res.status(400).json({message: "La catégorie n'existe pas"})
-                return
+            });
+
+            if (!existingCategory) {
+                res.status(400).json({ message: "La catégorie n'existe pas" });
+                return 
             }
-            categoryId = existingCategory._id.toString()
-        }else{
-            categoryId = "Default"
+            categoryId = existingCategory._id.toString();
+        } else {
+            categoryId = "Default";
         }
-        
-        
-        const session = driver.session();
-        
+
+       
         const resultDepense = await session.run(
             `
-            MATCH (d:Depense) WHERE id(d) = $_id
+            MATCH (u:User {id: $customerId})-[:A_FAIT]->(d:Depense {id: $uuid})
             OPTIONAL MATCH (d)-[r:APPARTIENT_A]->()
             DELETE r
             SET d.montant = $montant,
@@ -56,36 +58,52 @@ router.put("/update", async ( req: Request<DepenseDataWithId>, res: Response< nu
                 d.tags = $tags
             MERGE (b:Category {name: $categoryId})
             CREATE (d)-[:APPARTIENT_A]->(b)
-            RETURN d
+            RETURN d.id as depenseId
             `,
-            { _id: parseInt(_id), montant, description, date, tags, categoryId }
+            { uuid: _id, montant, description, date, tags, categoryId, customerId }
         );
 
         if (resultDepense.records.length === 0) {
-            res.status(404).send({ message: "Dépense non trouvée" })
-        }   
-
-        const key = customerId + "depenses"
-        const statKey = customerId + "depensesStat";
-        
-        let requests = await client.get(key);
-        let statRequests = await client.get(statKey);
-    
-
-        if (requests != null) {
-            await client.del(key); 
+            res.status(404).json({ message: "Dépense non trouvée ou vous n'avez pas les droits" });
+            return
         }
 
-        if (statRequests != null){
-            await client.del(statKey); 
-        }
+        await userInfoCollection.delete({
+            ids: [_id]
+        });
+
+        await userInfoCollection.add({
+            ids: [_id],
+            documents: [
+                `Dépense : ${description} ${montant}€ le ${date} - catégorie : ${categoryName}`
+            ],
+            metadatas: [{
+                user_id: customerId,
+                depense_id: _id,
+                categorie: categoryName,
+                type: 'depense'
+            }]
+        });
+
         
-        res.status(200).send({ message: "Dépense modifié avec succès" })
-        return
-    }catch(error){
-        console.log(error)
+        const key = `${customerId}depenses`;
+        const statKey = `${customerId}depensesStat`;
+
+        await Promise.all([
+            client.del(key),
+            client.del(statKey)
+        ]);
+
+        res.status(200).json({ message: "Dépense modifiée avec succès" });
+        return 
+
+    } catch (error: any) {
+        console.error("Erreur lors de la modification :", error);
         res.status(500).json({ message: "Erreur serveur" });
-        return ;
+        return 
+    } finally {
+        await session.close();
     }
-})
-export default router
+});
+
+export default router;

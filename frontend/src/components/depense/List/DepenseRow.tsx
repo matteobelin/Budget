@@ -48,12 +48,12 @@ function DepenseRow({ depense, onEdit, onDelete }: Props) {
 
         <TableCell className="text-right space-x-2">
           {onEdit && (
-            <Button variant="outline" size="sm" onClick={onEdit}>
+            <Button variant="outline" className="cursor-pointer" size="sm" onClick={onEdit}>
               Modifier
             </Button>
           )}
           {onDelete && (
-            <Button variant="destructive" size="sm" onClick={handleDeleteClick}>
+            <Button variant="destructive" className="cursor-pointer" size="sm" onClick={handleDeleteClick}>
               Supprimer
             </Button>
           )}

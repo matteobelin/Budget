@@ -52,7 +52,7 @@ function DepenseList() {
     <div className="w-full space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Liste des Dépenses</h2>
-        <Button size="sm" onClick={() => setShowFormCreate(true)}>
+        <Button size="sm" className="cursor-pointer" onClick={() => setShowFormCreate(true)}>
           Ajouter une dépense
         </Button>
       </div>

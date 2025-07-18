@@ -43,7 +43,7 @@ function CreateCategory({ onClose }: Props){
     
     return (
         <>
-        <CategoryForm onClose={onClose} onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage}/>
+        <CategoryForm  onSubmit={onSubmit} errorMessage={errorMessage} creationMessage={creationMessage}/>
         </>
     )
     

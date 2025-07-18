@@ -7,80 +7,79 @@ import driver from "../../dataBase/neo4j";
 
 const router = express.Router();
 
-router.get("/all", async ( req: Request, res: Response<DepenseDataError | GetListDepenseResponse> )=>{
-    try{
+router.get("/all", async (req: Request, res: Response<DepenseDataError | GetListDepenseResponse>) => {
+    const user = (req as any).user;
+    if (!user || !user.id) {
+        res.status(401).json({ message: "Utilisateur non authentifié" });
+        return 
+    }
+    const customerId = user.id;
+    const key = `${customerId}depenses`;
 
-        const user = (req as any).user;
-        const customerId = user.id;
+    let session;
 
-        const key = customerId + "depenses"
+    try {
+        const cached = await client.get(key);
 
-        let requests = await client.get(key);
+        if (cached) {
+            const depenses = JSON.parse(cached) as GetListDepenseResponse;
+            res.status(200).json(depenses);
+            return 
+        }
 
-        if (requests == null){
+        session = driver.session();
 
-            const session = driver.session();
-            const result = await session.run(
+        const result = await session.run(
             `
             MATCH (a:User {id: $customerId})-[:A_FAIT]->(c:Depense)-[:APPARTIENT_A]->(b:Category)
             RETURN c, b.name AS categoryId
             `,
-                { customerId }
-            );
+            { customerId }
+        );
 
-            const depenses: GetListDepenseResponse = [];
+        const depenses: GetListDepenseResponse = [];
 
-            for (const record of result.records) {
-                const c = record.get('c');
-                const categoryId = record.get('categoryId');
+        
 
-                if(categoryId!="Default"){
-                    const category = await Category.findById(categoryId);
-    
-                    if (!category){
-                        res.status(400).json({message:"Erreur lors du chargements des catégories"})
-                        return;
-                    }
-                    depenses.push({
-                        _id: c.identity.toString(),
-                        montant: c.properties.montant,
-                        description: c.properties.description,
-                        date: c.properties.date,
-                        tags: c.properties.tags || "",
-                        categoryName: category.categoryName,
-                        categoryColor: category.color
-                    });
-                }else{
-                    depenses.push({
-                        _id: c.identity.toString(),
-                        montant: c.properties.montant,
-                        description: c.properties.description,
-                        date: c.properties.date,
-                        tags: c.properties.tags || "",
-                        categoryName: "Default",
-                        categoryColor: "#A9A9A9"
-                    });
+        for (const record of result.records) {
+            const c = record.get('c');
+            const categoryId = record.get('categoryId');
+
+            let categoryName = "Default"
+            let categoryColor = "#A9A9A9"; 
+
+            if (categoryId !== "Default") {
+                const category = await Category.findById(categoryId );
+                if (!category) {
+                    res.status(400).json({ message: `Catégorie ${categoryId} non trouvée` });
+                    return 
                 }
-
-
-
+                categoryName = category.categoryName
+                categoryColor = category.color;
             }
 
-            await client.set(key, JSON.stringify(depenses));
-            await session.close();
-            
-            res.status(200).json(depenses);
-            return;
-
-        } else {
-            const existingDepense = JSON.parse(requests);
-            res.status(200).json(existingDepense);
-            return;
+            depenses.push({
+                _id: c.properties.id,
+                montant: c.properties.montant,
+                description: c.properties.description,
+                date: c.properties.date,
+                tags: c.properties.tags || "",
+                categoryName,
+                categoryColor
+            });
         }
-    }catch(error){
-        res.status(500).json({ message: "Erreur serveur" });
-        return ;
-    }
-})
 
-export default router
+        await client.set(key, JSON.stringify(depenses));
+        res.status(200).json(depenses);
+        return 
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erreur serveur" });
+        return
+    } finally {
+        if (session) await session.close();
+    }
+});
+
+export default router;

@@ -199,7 +199,7 @@ function DepenseForm({ initialData, errorMessage, onSubmit ,creationMessage}: Pr
                 </Alert>
             )}
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full cursor-pointer">
                 {initialData ? "Modifier" : "Créer"}
               </Button>
             </div>

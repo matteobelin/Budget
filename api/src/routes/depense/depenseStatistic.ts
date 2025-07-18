@@ -9,74 +9,70 @@ import { GetListDepenseResponse } from "../../interface/DepenseData";
 const router = express.Router();
 
 router.get("/statistic", async (req: Request, res: Response<DepenseDataError | DepenseStatisticTotal>) => {
+    const user = (req as any).user;
+    if (!user || !user.id) {
+        res.status(401).json({ message: "Utilisateur non authentifié" });
+        return
+    }
+
+    const customerId = user.id;
+    const statKey = `${customerId}depensesStat`;
+    const depenseKey = `${customerId}depenses`;
+
+    let session;
+
     try {
-        const user = (req as any).user;
-        const customerId = user.id;
-
-        const statKey = customerId + "depensesStat";
-        const depenseKey = customerId + "depenses";
-
-        
         const cachedStats = await client.get(statKey);
         if (cachedStats) {
             res.status(200).json(JSON.parse(cachedStats));
-            return;
+            return 
         }
 
-        
         let depenses: GetListDepenseResponse;
 
         const rawDepensesData = await client.get(depenseKey);
         if (rawDepensesData) {
             depenses = JSON.parse(rawDepensesData);
         } else {
-            // Chargement depuis Neo4j
-            const session = driver.session();
+            session = driver.session();
             const result = await session.run(`
                 MATCH (a:User {id: $customerId})-[:A_FAIT]->(c:Depense)-[:APPARTIENT_A]->(b:Category)
-                RETURN c, b.name AS categoryId
+                RETURN c, b.name AS categoryName
             `, { customerId });
 
             depenses = [];
 
             for (const record of result.records) {
                 const c = record.get('c');
-                const categoryId = record.get('categoryId');
+                const categoryId = record.get('categoryName');
+
+                let categoryName = "Default"
+                let categoryColor = "#A9A9A9";
 
                 if (categoryId !== "Default") {
                     const category = await Category.findById(categoryId);
                     if (!category) {
-                        res.status(400).json({ message: "Erreur lors du chargement des catégories" });
-                        return;
+                        res.status(400).json({ message: `Catégorie ${categoryId} non trouvée` });
+                        return 
                     }
-
-                    depenses.push({
-                        _id: c.identity.toString(),
-                        montant: c.properties.montant,
-                        description: c.properties.description,
-                        date: c.properties.date,
-                        tags: c.properties.tags || "",
-                        categoryName: category.categoryName,
-                        categoryColor: category.color
-                    });
-                } else {
-                    depenses.push({
-                        _id: c.identity.toString(),
-                        montant: c.properties.montant,
-                        description: c.properties.description,
-                        date: c.properties.date,
-                        tags: c.properties.tags || "",
-                        categoryName: "Default",
-                        categoryColor: "#A9A9A9"
-                    });
+                    categoryColor = category.color;
+                    categoryName = category.categoryName
                 }
+
+                depenses.push({
+                    _id: c.properties.id, // UUID
+                    montant: c.properties.montant,
+                    description: c.properties.description,
+                    date: c.properties.date,
+                    tags: c.properties.tags || "",
+                    categoryName,
+                    categoryColor
+                });
             }
 
             await client.set(depenseKey, JSON.stringify(depenses));
-            await session.close();
         }
 
-       
         const grouped = new Map<
             string,
             Map<string, Map<string, { categoryColor: string; amount: number }>>
@@ -86,24 +82,18 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
             const date = new Date(depense.date);
             const year = date.getFullYear().toString();
             const month = (date.getMonth() + 1).toString().padStart(2, "0");
-            const category = depense.categoryName;
-            const color = depense.categoryColor;
-            const amount = depense.montant;
+            const { categoryName, categoryColor, montant } = depense;
 
-            if (!grouped.has(year)) {
-                grouped.set(year, new Map());
-            }
+            if (!grouped.has(year)) grouped.set(year, new Map());
             const yearMap = grouped.get(year)!;
 
-            if (!yearMap.has(month)) {
-                yearMap.set(month, new Map());
-            }
+            if (!yearMap.has(month)) yearMap.set(month, new Map());
             const monthMap = yearMap.get(month)!;
 
-            if (!monthMap.has(category)) {
-                monthMap.set(category, { categoryColor: color, amount: 0 });
+            if (!monthMap.has(categoryName)) {
+                monthMap.set(categoryName, { categoryColor, amount: 0 });
             }
-            monthMap.get(category)!.amount += amount;
+            monthMap.get(categoryName)!.amount += montant;
         }
 
         const result: DepenseStatisticTotal = [];
@@ -124,7 +114,7 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
                 monthsArray.push({
                     month,
                     statistics: stats,
-                    amountTotal: amountTotalByMonth,
+                    amountTotal: amountTotalByMonth
                 });
 
                 amountTotalByYear += amountTotalByMonth;
@@ -133,23 +123,26 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
             result.push({
                 year,
                 statistics: monthsArray,
-                amountTotalByYear,
+                amountTotalByYear
             });
         }
 
-        
         result.sort((a, b) => a.year.localeCompare(b.year));
         for (const yearEntry of result) {
             yearEntry.statistics.sort((a, b) => a.month.localeCompare(b.month));
         }
 
-    
         await client.set(statKey, JSON.stringify(result));
 
         res.status(200).json(result);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erreur serveur" });
+        return 
+
+    } catch (error: any) {
+        console.error("Erreur lors des statistiques :", error);
+        res.status(500).json({ message: "Erreur serveur"});
+        return 
+    } finally {
+        if (session) await session.close();
     }
 });
 

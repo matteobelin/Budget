@@ -8,7 +8,8 @@ import cookieParser from 'cookie-parser';
 import {authMiddleware} from "./middleware/authMiddleWare"
 import categoryRoutes from "./routes/category"
 import depenseRoutes from "./routes/depense"
-
+import conseilRoutes from "./routes/conseil"
+import initializeTips from './utils/configTips';
 
 const app = express();
 const port = 3000;
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use("/category",authMiddleware,categoryRoutes)
 app.use("/depense",authMiddleware,depenseRoutes)
+app.use("/conseil", authMiddleware,conseilRoutes)
 app.use(getMe);
 
 
@@ -31,6 +33,7 @@ app.use(getMe);
   try {
     await connectDB();
     await connectRedis()
+    await initializeTips();
     app.listen(port, () => {
       console.log(`Server running on http://localhost:${port}`);
     });
