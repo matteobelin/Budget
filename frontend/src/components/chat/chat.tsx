@@ -27,7 +27,6 @@ export function ChatDemo() {
     }
   }, [messages, setMessages])
 
-
   const lastMessage = messages.at(-1)
   const isTyping = lastMessage?.role === "user" && (loading || isLoading)
 
@@ -99,8 +98,8 @@ export function ChatDemo() {
   }
 
   return (
-    <div className="flex flex-col h-screen p-4">
-      <div className="flex-1 overflow-y-auto">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto min-h-0">
         <ChatMessages messages={messages}>
           <MessageList messages={messages} isTyping={isTyping} />
           <div ref={messagesEndRef} />
@@ -108,7 +107,7 @@ export function ChatDemo() {
       </div>
 
       <ChatForm
-        className="bg-white border-t p-2"
+        className="bg-white border-t p-2 flex-shrink-0"
         handleSubmit={onSubmit}
         isPending={loading || isLoading}
       >

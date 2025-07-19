@@ -14,8 +14,14 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import CategoryContext from "@/context/CategoryContext"
+import DepenseContext from "@/context/DepenseContext"
+
 
 function Login() {
+
+    const {refreshDepenses} = useContext(DepenseContext)
+    const {refreshCategories} = useContext(CategoryContext)
     const { name, login } = useContext(UserContext)
     const navigation = useNavigate()
     const [errorMessage, setErrorMessage] = useState("")
@@ -54,6 +60,8 @@ function Login() {
             }
             const user: LoginDataReception = responseData;
             login(user);
+            refreshDepenses()
+            refreshCategories()
             navigation("/");
         } catch (error) {
             setErrorMessage("Une erreur est survenue lors de la connexion")

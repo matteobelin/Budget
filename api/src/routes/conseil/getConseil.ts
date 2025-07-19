@@ -45,7 +45,8 @@ router.post("/", async ( req: Request, res: Response<ConseilDataError | ConseilD
 
     const prompt = `Voici des informations sur le budget de l'utilisateur :${contextUser}
                     Voici des conseils généraux en gestion de budget :${contextTips}
-                    En te basant sur ces informations, réponds à la question suivante :${requete}`;
+                    En te basant sur ces informations, réponds à la question suivante :${requete}
+                    Ne fais pas de tableau je veux uniquement du texte`;
 
     const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
