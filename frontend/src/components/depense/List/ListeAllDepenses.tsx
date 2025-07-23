@@ -113,47 +113,118 @@ function DepenseList() {
         </Dialog>
       )}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Catégorie</TableHead>
-            <TableHead 
-              className="cursor-pointer"
-              onClick={() => handleSort('montant')}
-            >
-              <div className="flex items-center">
-                Montant
-                {getSortIcon('montant')}
+      {/* Desktop view - Table */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Catégorie</TableHead>
+              <TableHead 
+                className="cursor-pointer"
+                onClick={() => handleSort('montant')}
+              >
+                <div className="flex items-center">
+                  Montant
+                  {getSortIcon('montant')}
+                </div>
+              </TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead 
+                className="pl-8 cursor-pointer"
+                onClick={() => handleSort('date')}
+              >
+                <div className="flex items-center">
+                  Date
+                  {getSortIcon('date')}
+                </div>
+              </TableHead>
+              <TableHead>Tags</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedDepenses.map((depense) => (
+              <DepenseRow
+                key={depense._id}
+                depense={depense}
+                onEdit={() =>{
+                  setDepenseToEdit(depense)
+                  setShowFormEdit(true)
+                }}
+                onDelete={() => handleDelete(depense)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile view - Cards */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        <div className="flex justify-between mb-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex items-center" 
+            onClick={() => handleSort('date')}
+          >
+            Trier par date {getSortIcon('date')}
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex items-center" 
+            onClick={() => handleSort('montant')}
+          >
+            Trier par montant {getSortIcon('montant')}
+          </Button>
+        </div>
+
+        {sortedDepenses.map((depense) => (
+          <div key={depense._id} className="bg-white rounded-lg shadow p-4 space-y-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <span
+                  className="w-4 h-4 rounded-full border border-black"
+                  style={{ backgroundColor: depense.categoryColor }}
+                ></span>
+                <span className="font-medium">{depense.categoryName}</span>
               </div>
-            </TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead 
-              className="pl-8 cursor-pointer"
-              onClick={() => handleSort('date')}
-            >
-              <div className="flex items-center">
-                Date
-                {getSortIcon('date')}
-              </div>
-            </TableHead>
-            <TableHead>Tags</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedDepenses.map((depense) => (
-            <DepenseRow
-              key={depense._id}
-              depense={depense}
-              onEdit={() =>{
-                setDepenseToEdit(depense)
-                setShowFormEdit(true)
-              }}
-              onDelete={() => handleDelete(depense)}
-            />
-          ))}
-        </TableBody>
-      </Table>
+              <span className="font-bold">{depense.montant} €</span>
+            </div>
+
+            <div>
+              <p className="text-sm text-gray-700">{depense.description}</p>
+            </div>
+
+            <div className="flex justify-between items-center text-sm text-gray-500">
+              <span>{new Date(depense.date).toLocaleDateString("fr-FR")}</span>
+              {depense.tags && <span>{depense.tags}</span>}
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-2">
+              <Button 
+                variant="outline" 
+                className="cursor-pointer" 
+                size="sm" 
+                onClick={() => {
+                  setDepenseToEdit(depense)
+                  setShowFormEdit(true)
+                }}
+              >
+                Modifier
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="cursor-pointer" 
+                size="sm" 
+                onClick={() => handleDelete(depense)}
+              >
+                Supprimer
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
