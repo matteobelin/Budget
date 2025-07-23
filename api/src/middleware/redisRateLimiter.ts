@@ -13,7 +13,8 @@ export default async function redisRateLimiter(req: Request, res: Response, next
     }
 
     if (parseInt(requests) >= MAX_REQUESTS) {
-        res.status(429).send().json({message:"Top de requete veuillez réessayer dans 60 sec"});
+        const ttl = await client.ttl(key);
+        res.status(429).json({message:`Top de requete veuillez réessayer dans ${ttl} seconde${ttl > 1 ?  "s" : ""}`});
         return
     }
 
