@@ -42,8 +42,9 @@ function CategorieList(){
                   }
                   toast.success(responseData.message || "Suppression réussie !");
                   await refreshCategories()
+
                   await refreshDepenses()
-        } catch (error) {
+        } catch {
           toast.error("Erreur serveur");
         }
      };
@@ -78,32 +79,84 @@ function CategorieList(){
         </Dialog>
       )}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[200px]">Catégorie</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          
-          <CategoryRow
-            category={{ categoryName: "Default", color: "#A9A9A9" }}
-            isDefault={true}
-          />
-          {categories.map((category) => (
+      {/* Desktop view - Table */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[200px]">Catégorie</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             <CategoryRow
-              key={category._id}
-              category={category}
-              onEdit={() => {
-                setCategoryToEdit(category);
-                setShowFormEdit(true);
-              }}
-              onDelete={() => handleDelete(category)}
+              category={{ categoryName: "Default", color: "#A9A9A9" }}
+              isDefault={true}
             />
-          ))}
-        </TableBody>
-      </Table>
+            {categories.map((category) => (
+              <CategoryRow
+                key={category._id}
+                category={category}
+                onEdit={() => {
+                  setCategoryToEdit(category);
+                  setShowFormEdit(true);
+                }}
+                onDelete={() => handleDelete(category)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile view - Cards */}
+      <div className="grid grid-cols-1 gap-3 md:hidden">
+        {/* Default category card */}
+        <div className="bg-white rounded-lg shadow p-3">
+          <div className="flex items-center space-x-2">
+            <span
+              className="w-4 h-4 rounded-full border border-black"
+              style={{ backgroundColor: "#A9A9A9" }}
+            ></span>
+            <span className="font-medium">Default</span>
+          </div>
+        </div>
+
+        {/* Category cards */}
+        {categories.map((category) => (
+          <div key={category._id} className="bg-white rounded-lg shadow p-3">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <span
+                  className="w-4 h-4 rounded-full border border-black"
+                  style={{ backgroundColor: category.color }}
+                ></span>
+                <span className="font-medium">{category.categoryName}</span>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="cursor-pointer" 
+                  onClick={() => {
+                    setCategoryToEdit(category);
+                    setShowFormEdit(true);
+                  }}
+                >
+                  Modifier
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  className="cursor-pointer" 
+                  size="sm" 
+                  onClick={() => handleDelete(category)}
+                >
+                  Supprimer
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
