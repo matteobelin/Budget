@@ -9,10 +9,12 @@ import CreateCategory from "../CreateCategory"
 import EditCategory from "../EditCategory"
 import type { CategoryDataWithId } from "@/interface/CategoryInterface"
 import {Dialog,DialogContent,DialogTitle,DialogDescription } from "@/components/ui/dialog"
+import DepenseContext from "@/context/DepenseContext"
 
 function CategorieList(){
 
     const {categories, refreshCategories } = useContext(CategoryContext)
+    const { refreshDepenses }= useContext(DepenseContext)
     const [categoryToEdit, setCategoryToEdit] = useState<CategoryDataWithId | null>(null);
     const [showFormCreate, setShowFormCreate] = useState(false)
     const [showFormEdit, setShowFormEdit] = useState(false)
@@ -40,6 +42,7 @@ function CategorieList(){
                   }
                   toast.success(responseData.message || "Suppression réussie !");
                   await refreshCategories()
+                  await refreshDepenses()
         } catch (error) {
           toast.error("Erreur serveur");
         }
