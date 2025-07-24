@@ -67,12 +67,12 @@ Créez un fichier `.env` dans le dossier `api` avec les variables suivantes:
 
 ```
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/budget
+DB_URL = "mongodb://localhost:27017/cashSlayer"
 
 # Neo4j
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=passw0rd
+NEO4J_URL = "bolt://localhost:7687"
+NEO4J_USER = 
+NEO4J_PASSWORD = 
 
 # Redis
 REDIS_URL=redis://localhost:6379
@@ -80,12 +80,16 @@ REDIS_URL=redis://localhost:6379
 # ChromaDB
 CHROMA_URL=http://localhost:8000
 
-# JWT
-JWT_SECRET=votre_secret_jwt
-JWT_EXPIRES_IN=7d
+# Rate Limiting
+TIME_WINDOW = 60
+MAX_REQUESTS = 5
 
-# API
-PORT=3000
+# Mistral AI
+MISTRAL_API_KEY=
+
+# JWT
+JWT_SECRET=
+
 ```
 
 ## Règles de Contribution
