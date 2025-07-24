@@ -20,7 +20,7 @@ Cette application de gestion de budget permet aux utilisateurs de suivre leurs d
 - **Backend**: Node.js, Express.js, TypeScript
 - **Bases de données**:
   - MongoDB: Stockage des utilisateurs et catégories
-  - Neo4j: Gestion des dépenses et leurs relations
+  - Neo4j: Gestion des dépenses et leurs connections
   - Redis: Cache et gestion des sessions
   - ChromaDB: Stockage vectoriel pour les fonctionnalités d'IA
 
@@ -140,19 +140,3 @@ feat/date-filter : ajouter la fonctionnalité de filtrage par date
 - Utilisez ESLint et Prettier pour formater votre code
 - Suivez les principes SOLID et les bonnes pratiques de programmation
 - Documentez les fonctions et composants complexes
-
-## Déploiement
-
-### Production
-
-Pour déployer l'application en production:
-
-1. Construire les images Docker:
-   ```bash
-   docker-compose -f docker-compose.prod.yml build
-   ```
-
-2. Déployer les conteneurs:
-   ```bash
-   docker-compose -f docker-compose.prod.yml up -d
-   ```
