@@ -12,7 +12,7 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
     const user = (req as any).user;
     if (!user || !user.id) {
         res.status(401).json({ message: "Utilisateur non authentifié" });
-        return
+        return;
     }
 
     const customerId = user.id;
@@ -25,7 +25,7 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
         const cachedStats = await client.get(statKey);
         if (cachedStats) {
             res.status(200).json(JSON.parse(cachedStats));
-            return 
+            return;
         }
 
         let depenses: GetListDepenseResponse;
@@ -35,40 +35,53 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
             depenses = JSON.parse(rawDepensesData);
         } else {
             session = driver.session();
+            
             const result = await session.run(`
-                MATCH (a:User {id: $customerId})-[:A_FAIT]->(c:Depense)-[:APPARTIENT_A]->(b:Category)
-                RETURN c, b.name AS categoryName
+                MATCH (u:User {id: $customerId})-[:A_FAIT]->(d:Depense)-[:APPARTIENT_A]->(c:Category)
+                RETURN 
+                    d.id AS depenseId,
+                    d.montant AS montant,
+                    d.description AS description,
+                    d.date AS date,
+                    d.tags AS tags,
+                    c.name AS categoryId
+                ORDER BY d.date
             `, { customerId });
 
-            depenses = [];
+            const categoryIds = [...new Set(
+                result.records
+                    .map(record => record.get('categoryId'))
+                    .filter(id => id !== "Default")
+            )];
 
-            for (const record of result.records) {
-                const c = record.get('c');
-                const categoryId = record.get('categoryName');
+            const categories = await Category.find({ _id: { $in: categoryIds } });
+            const categoryMap = new Map(
+                categories.map(cat => [cat._id.toString(), { name: cat.categoryName, color: cat.color }])
+            );
 
-                let categoryName = "Default"
+            depenses = result.records.map(record => {
+                const categoryId = record.get('categoryId');
+                let categoryName = "Default";
                 let categoryColor = "#A9A9A9";
 
                 if (categoryId !== "Default") {
-                    const category = await Category.findById(categoryId);
-                    if (!category) {
-                        res.status(400).json({ message: `Catégorie ${categoryId} non trouvée` });
-                        return 
+                    const categoryInfo = categoryMap.get(categoryId);
+                    if (categoryInfo) {
+                        categoryName = categoryInfo.name;
+                        categoryColor = categoryInfo.color;
                     }
-                    categoryColor = category.color;
-                    categoryName = category.categoryName
                 }
 
-                depenses.push({
-                    _id: c.properties.id, // UUID
-                    montant: c.properties.montant,
-                    description: c.properties.description,
-                    date: c.properties.date,
-                    tags: c.properties.tags || "",
+                return {
+                    _id: record.get('depenseId'),
+                    montant: record.get('montant'),
+                    description: record.get('description'),
+                    date: record.get('date'),
+                    tags: record.get('tags') || "",
                     categoryName,
                     categoryColor
-                });
-            }
+                };
+            });
 
             await client.set(depenseKey, JSON.stringify(depenses));
         }
@@ -135,12 +148,10 @@ router.get("/statistic", async (req: Request, res: Response<DepenseDataError | D
         await client.set(statKey, JSON.stringify(result));
 
         res.status(200).json(result);
-        return 
 
     } catch (error: any) {
         console.error("Erreur lors des statistiques :", error);
-        res.status(500).json({ message: "Erreur serveur"});
-        return 
+        res.status(500).json({ message: "Erreur serveur" });
     } finally {
         if (session) await session.close();
     }
