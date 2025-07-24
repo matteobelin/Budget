@@ -2,6 +2,7 @@ import { useState, useContext } from "react"
 import type { CategoryData, CategoryDataWithId} from "@/interface/CategoryInterface";
 import CategoryForm from "./CategoryForm";
 import CategoryContext from "@/context/CategoryContext";
+import DepenseContext from "@/context/DepenseContext";
 
 interface Props{
     onClose: () => void;
@@ -13,6 +14,7 @@ function EditCategory({onClose,category}:Props){
     const [errorMessage, setErrorMessage] = useState("")
 
     const { refreshCategories } = useContext(CategoryContext);
+    const { refreshDepenses } = useContext(DepenseContext)
 
     const [creationMessage, setCreationMessage] = useState("")
 
@@ -39,6 +41,7 @@ function EditCategory({onClose,category}:Props){
                 }
                 setCreationMessage(responseData.message)
                 await refreshCategories()
+                await refreshDepenses()
                 setTimeout(onClose, 1000);
     
             }catch (error){
